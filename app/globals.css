@@ -1,0 +1,46 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  overflow-x: hidden;
+  background: #ffffff;
+  color: #000000;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+::selection {
+  background: #000000;
+  color: #ffffff;
+}
+
+.container-safe {
+  @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+}
+
+.glass-border {
+  @apply border border-black/10 bg-white;
+}
+
+.btn-base {
+  @apply inline-flex items-center justify-center rounded-full px-4 py-3 text-sm font-medium transition active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50;
+}
+
+.input-base {
+  @apply w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm outline-none transition placeholder:text-black/40 focus:border-black;
+}
+
+.card-base {
+  @apply rounded-3xl border border-black/10 bg-white shadow-sm;
+}
+
+.section-title {
+  @apply text-2xl font-semibold tracking-tight sm:text-3xl;
+}
