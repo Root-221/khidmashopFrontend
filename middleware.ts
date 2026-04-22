@@ -6,8 +6,9 @@ export function middleware(request: NextRequest) {
   const authHeader = request.headers.get("authorization");
   const token = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : null;
 
-  if (request.nextUrl.pathname === "/admin" && (token || (refreshToken && role === "ADMIN"))) {
-    return NextResponse.redirect(new URL("/admin/dashboard", request.url));
+  // Allow always accessing the /admin login page to prevent being stuck with invalid cookies
+  if (request.nextUrl.pathname === "/admin") {
+    return NextResponse.next();
   }
 
   if (request.nextUrl.pathname.startsWith("/admin") && request.nextUrl.pathname !== "/admin") {

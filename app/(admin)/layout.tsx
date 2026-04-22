@@ -5,8 +5,9 @@ import { usePathname, useRouter } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { AdminSidebar } from "@/components/layout/AdminSidebar";
 import { Modal } from "@/components/ui/Modal";
-import { logout as endSession } from "@/services/auth.service";
+import { logout as endSession, loadUserProfile } from "@/services/auth.service";
 import { useAuthStore } from "@/stores/useAuthStore";
+import { Loader } from "@/components/ui/Loader";
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
@@ -14,16 +15,35 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   const isLoginPage = pathname === "/admin";
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
-  const clearSession = useAuthStore((state) => state.clearSession);
+  
+  const { user, isInitialized, setInitialized, clearSession } = useAuthStore();
+
+  useEffect(() => {
+    const initAuth = async () => {
+      if (!isInitialized && !isLoginPage) {
+        try {
+          await loadUserProfile();
+        } catch (error) {
+          console.error("Auth initialization failed", error);
+        } finally {
+          setInitialized(true);
+        }
+      } else if (isLoginPage) {
+        setInitialized(true);
+      }
+    };
+
+    initAuth();
+  }, [isInitialized, isLoginPage, setInitialized]);
 
   useEffect(() => {
     setMobileNavOpen(false);
     
-    // Safety check: if we're not on the login page and session is cleared, redirect to home
-    if (!isLoginPage && !useAuthStore.getState().user) {
+    // Safety check: if we're initialized, not on login page, and still no user, redirect to home
+    if (isInitialized && !isLoginPage && !user) {
       router.replace("/");
     }
-  }, [pathname, isLoginPage, router]);
+  }, [pathname, isLoginPage, router, isInitialized, user]);
 
   const handleLogout = async () => {
     try {

@@ -13,6 +13,8 @@ type AuthState = {
   token: string | null;
   accessTokenExpiresAt: number | null;
   isHydrated: boolean;
+  isInitialized: boolean;
+  setInitialized: (value: boolean) => void;
   setHydrated: (value: boolean) => void;
   setToken: (token: string | null) => void;
   setUser: (user: AuthUser | null) => void;
@@ -23,7 +25,9 @@ export const useAuthStore = create<AuthState>()((set) => ({
   user: null,
   token: null,
   accessTokenExpiresAt: null,
-  isHydrated: true,
+  isHydrated: false,
+  isInitialized: false,
+  setInitialized: (value) => set({ isInitialized: value }),
   setHydrated: (value) => set({ isHydrated: value }),
   setToken: (token) => {
     set({
@@ -32,5 +36,5 @@ export const useAuthStore = create<AuthState>()((set) => ({
     });
   },
   setUser: (user) => set({ user }),
-  clearSession: () => set({ user: null, token: null, accessTokenExpiresAt: null }),
+  clearSession: () => set({ user: null, token: null, accessTokenExpiresAt: null, isInitialized: false }),
 }));
