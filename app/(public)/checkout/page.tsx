@@ -5,10 +5,10 @@ import { useRouter } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
 import { ArrowLeft, ChevronDown } from "lucide-react";
 import { useCartStore } from "@/stores/useCartStore";
+import { useUiStore } from "@/stores/useUiStore";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import { useToast } from "@/hooks/useToast";
 import { Loader } from "@/components/ui/Loader";
-import { InvoiceView } from "@/features/checkout/InvoiceView";
 import { formatCurrency } from "@/utils/format";
 import { checkPhoneExists, createGuestOrder } from "@/services/guest.service";
 import countries, { CountryIndicator, DEFAULT_COUNTRY_CODE } from "@/data/countries";
@@ -28,8 +28,10 @@ export default function CheckoutPage() {
 
   const [step, setStep] = useState<Step>("phone");
   const [phone, setPhone] = useState("");
+  const [confirmPhone, setConfirmPhone] = useState("");
   const [isPhoneDirty, setIsPhoneDirty] = useState(false);
-  const [existingUser, setExistingUser] = useState<{ id: string; name: string; address?: string } | null>(null);
+  const [isConfirmPhoneDirty, setIsConfirmPhoneDirty] = useState(false);
+  const [existingUser, setExistingUser] = useState<{ id: string; name: string; address?: string; hasPin: boolean } | null>(null);
   const [orderCreated, setOrderCreated] = useState(false);
   const [lastOrder, setLastOrder] = useState<Order | null>(null);
 
@@ -68,7 +70,9 @@ export default function CheckoutPage() {
     ? expectedLengths.includes(nationalNumber.length)
     : nationalNumber.length >= 8;
   const isPhoneValid = !!formattedPhone && isNationalLengthValid;
+  const isMatch = phone === confirmPhone;
   const showInvalidPhone = isPhoneDirty && digitsOnly.length > 0 && !isPhoneValid;
+  const showMismatch = isConfirmPhoneDirty && confirmPhone.length > 0 && !isMatch;
   const expectedLengthHint = expectedLengths
     ? ` (${expectedLengths.join(" ou ")} chiffres)`
     : "";
@@ -129,6 +133,14 @@ export default function CheckoutPage() {
       setOrderCreated(true);
       clearCart();
       toast.success("Commande créée", `Votre commande est confirmée`);
+      
+      // If new user OR existing user without PIN, show PIN setup
+      if (!existingUser || !existingUser.hasPin) {
+        useUiStore.getState().openPinSetupModal(formattedPhone);
+      } else {
+        // Redirection vers les commandes pour les clients déjà authentifiés
+        router.push("/orders");
+      }
     },
     onError: (err: Error) => {
       toast.error("Échec de la commande", err.message);
@@ -171,17 +183,10 @@ export default function CheckoutPage() {
     );
   }
 
-  if (orderCreated && lastOrder) {
+  if (orderCreated) {
     return (
-      <div className="container-safe space-y-6 py-6 pb-8">
-        <div>
-          <p className="text-xs uppercase tracking-[0.3em] text-black/45">Checkout</p>
-          <h1 className="section-title">Commande confirmée</h1>
-        </div>
-        <InvoiceView order={lastOrder} />
-        <button onClick={handleContinueShopping} className="btn-base w-full bg-black px-4 py-3 text-white">
-         Continuer vos achats
-        </button>
+      <div className="container-safe py-12 text-center space-y-4">
+        <Loader label="Commande réussie ! Redirection..." />
       </div>
     );
   }
@@ -223,60 +228,86 @@ export default function CheckoutPage() {
             <p className="text-sm text-black/60">Nous vérifierons si vous êtes déjà client</p>
           </div>
 
-          <div className="flex items-stretch gap-2">
-            <div ref={countryPickerRef} className="relative w-28">
-              <button
-                type="button"
-                onClick={() => setCountryDropdownOpen((current) => !current)}
-                className="relative z-20 flex w-full items-center justify-between gap-2 rounded-2xl border border-black/10 bg-white px-3 py-2 text-sm font-medium text-black shadow-sm transition hover:border-black/30"
-              >
-                <span className="text-lg">{selectedCountry.flag}</span>
-                <span className="text-xs uppercase tracking-[0.2em]">{selectedCountry.dial}</span>
-                <ChevronDown className="h-4 w-4 text-black/60" />
-              </button>
-              {countryDropdownOpen && (
-                <div className="absolute left-0 top-full z-30 mt-2 w-full max-h-[18rem] overflow-y-auto rounded-2xl border border-black/10 bg-white py-1 shadow-lg">
-                  {countries.map((country) => (
-                    <button
-                      key={country.code}
-                      type="button"
-                      onClick={() => {
-                        setSelectedCountry(country);
-                        setCountryDropdownOpen(false);
-                      }}
-                      className="flex w-full items-center justify-between gap-2 px-3 py-2 text-sm text-black transition hover:bg-black/5"
-                    >
-                      <span className="text-lg">{country.flag}</span>
-                      <span className="text-xs uppercase tracking-[0.2em]">{country.dial}</span>
-                    </button>
-                  ))}
-                </div>
-              )}
+          <div className="space-y-4">
+            <div className="flex items-stretch gap-2">
+              <div ref={countryPickerRef} className="relative w-28">
+                <button
+                  type="button"
+                  onClick={() => setCountryDropdownOpen((current) => !current)}
+                  className="relative z-20 flex w-full items-center justify-between gap-2 rounded-2xl border border-black/10 bg-white px-3 py-2 text-sm font-medium text-black shadow-sm transition hover:border-black/30"
+                >
+                  <span className="text-lg">{selectedCountry.flag}</span>
+                  <span className="text-xs uppercase tracking-[0.2em]">{selectedCountry.dial}</span>
+                  <ChevronDown className="h-4 w-4 text-black/60" />
+                </button>
+                {countryDropdownOpen && (
+                  <div className="absolute left-0 top-full z-30 mt-2 w-full max-h-[18rem] overflow-y-auto rounded-2xl border border-black/10 bg-white py-1 shadow-lg">
+                    {countries.map((country) => (
+                      <button
+                        key={country.code}
+                        type="button"
+                        onClick={() => {
+                          setSelectedCountry(country);
+                          setCountryDropdownOpen(false);
+                        }}
+                        className="flex w-full items-center justify-between gap-2 px-3 py-2 text-sm text-black transition hover:bg-black/5"
+                      >
+                        <span className="text-lg">{country.flag}</span>
+                        <span className="text-xs uppercase tracking-[0.2em]">{country.dial}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <div className="flex-1">
+                <input
+                  type="tel"
+                  value={phone}
+                  onChange={(event) => {
+                    setPhone(event.target.value);
+                    if (!isPhoneDirty) {
+                      setIsPhoneDirty(true);
+                    }
+                  }}
+                  placeholder="Numéro de téléphone"
+                  className="input-base w-full"
+                />
+                {showInvalidPhone && (
+                  <p className="mt-1 text-xs font-medium text-red-600">
+                    Numéro incorrect{expectedLengthHint}
+                  </p>
+                )}
+              </div>
             </div>
-            <div className="flex-1">
-              <input
-                value={phone}
-                onChange={(event) => {
-                  setPhone(event.target.value);
-                  if (!isPhoneDirty) {
-                    setIsPhoneDirty(true);
-                  }
-                }}
-                placeholder="700 000 000"
-                className="input-base w-full"
-              />
-              {showInvalidPhone && (
-                <p className="mt-1 text-xs font-medium text-red-600">
-                  Numéro incorrect{expectedLengthHint}
-                </p>
-              )}
+
+            <div className="flex items-stretch gap-2">
+              <div className="w-28 opacity-0 pointer-events-none" />
+              <div className="flex-1">
+                <input
+                  type="tel"
+                  value={confirmPhone}
+                  onChange={(event) => {
+                    setConfirmPhone(event.target.value);
+                    if (!isConfirmPhoneDirty) {
+                      setIsConfirmPhoneDirty(true);
+                    }
+                  }}
+                  placeholder="Confirmez le numéro"
+                  className="input-base w-full"
+                />
+                {showMismatch && (
+                  <p className="mt-1 text-xs font-medium text-red-600">
+                    Les numéros ne correspondent pas
+                  </p>
+                )}
+              </div>
             </div>
           </div>
 
           <button
             type="button"
             onClick={handlePhoneSubmit}
-            disabled={!isPhoneValid || phoneCheckMutation.isPending}
+            disabled={!isPhoneValid || !isMatch || phoneCheckMutation.isPending}
             className="btn-base w-full bg-black px-5 py-4 text-white"
           >
             {phoneCheckMutation.isPending ? <Loader label="Vérification..." /> : "Continuer"}

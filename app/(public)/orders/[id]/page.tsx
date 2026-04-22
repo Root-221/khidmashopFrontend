@@ -6,6 +6,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { ArrowLeft, Clock, MapPin, Package2, Phone, User, X, Download } from 'lucide-react';
 import { getOrderById, cancelOrder } from '@/services/order.service';
+import Image from 'next/image';
 import { generateInvoicePdf } from '@/utils/pdf';
 import { Order } from '@/types/order';
 import { formatCurrency, formatDate, orderLabel, orderStatusLabel } from '@/utils/format';
@@ -138,7 +139,7 @@ export default function OrderDetailPage() {
                 <div key={item.id} className="flex items-center gap-3 bg-white px-4 py-3">
                   <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-xl border border-black/8 bg-black/5">
                     {image ? (
-                      <img src={image} alt={item.productSnapshot.name} className="h-full w-full object-cover" />
+                      <Image src={image} alt={item.productSnapshot.name} fill className="object-cover" />
                     ) : (
                       <div className="flex h-full w-full items-center justify-center">
                         <Package2 className="h-5 w-5 text-black/20" />

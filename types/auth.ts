@@ -20,3 +20,13 @@ export type OtpVerifyPayload = {
   role: AuthRole;
   otp: string;
 };
+
+export type ClientLoginPayload = {
+  phone: string;
+  pin: string;
+};
+
+export type SetPinPayload = {
+  phone: string;
+  pin: string;
+};

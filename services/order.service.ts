@@ -14,7 +14,6 @@ export async function searchOrdersByPhone(phone: string) {
   return request<Order[]>('/orders/search', {
     method: 'POST',
     body: { phone },
-    skipAuth: true,
   });
 }
 

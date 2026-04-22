@@ -1,6 +1,6 @@
 import { useAuthStore } from '@/stores/useAuthStore';
 import { request } from '@/services/api.client';
-import { AuthRole, AuthUser, OtpSendPayload, OtpVerifyPayload } from '@/types/auth';
+import { AuthRole, AuthUser, OtpSendPayload, OtpVerifyPayload, ClientLoginPayload, SetPinPayload } from '@/types/auth';
 import { getUserProfile } from '@/services/user.service';
 
 type TokenResponse = {
@@ -25,6 +25,31 @@ export async function verifyOtp(payload: OtpVerifyPayload): Promise<TokenRespons
 
   useAuthStore.getState().setToken(data.accessToken);
   useAuthStore.getState().setUser({ id: '', name: 'Client', phone: '', role: data.role });
+  await loadUserProfile();
+  return data;
+}
+export async function clientLogin(payload: ClientLoginPayload): Promise<TokenResponse> {
+  const data = await request<TokenResponse>('/auth/login-client', {
+    method: 'POST',
+    body: payload,
+    skipAuth: true,
+  });
+
+  useAuthStore.getState().setToken(data.accessToken);
+  useAuthStore.getState().setUser({ id: '', name: 'Client', phone: payload.phone, role: data.role });
+  await loadUserProfile();
+  return data;
+}
+
+export async function setPin(payload: SetPinPayload): Promise<TokenResponse> {
+  const data = await request<TokenResponse>('/auth/set-pin', {
+    method: 'POST',
+    body: payload,
+    skipAuth: true,
+  });
+
+  useAuthStore.getState().setToken(data.accessToken);
+  useAuthStore.getState().setUser({ id: '', name: 'Client', phone: payload.phone, role: data.role });
   await loadUserProfile();
   return data;
 }

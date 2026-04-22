@@ -1,11 +1,7 @@
 import { Order, OrderStatus } from "@/types/order";
 
 export function formatCurrency(amount: number) {
-  return new Intl.NumberFormat("fr-FR", {
-    style: "currency",
-    currency: "XOF",
-    maximumFractionDigits: 0,
-  }).format(amount);
+  return amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " F CFA";
 }
 
 export function formatDate(value: string | number | Date) {

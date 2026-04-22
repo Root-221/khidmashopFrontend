@@ -2,7 +2,7 @@ import { request } from '@/services/api.client';
 import { Order } from '@/types/order';
 
 export async function checkPhoneExists(phone: string) {
-  return request<{ exists: boolean; user?: { id: string; name: string; address?: string } }>('/orders/check-phone', {
+  return request<{ exists: boolean; user?: { id: string; name: string; address?: string; hasPin: boolean } }>('/orders/check-phone', {
     method: 'POST',
     body: { phone },
     skipAuth: true,
