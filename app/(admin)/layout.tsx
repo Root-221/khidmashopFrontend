@@ -18,14 +18,19 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     setMobileNavOpen(false);
-  }, [pathname]);
+    
+    // Safety check: if we're not on the login page and session is cleared, redirect to home
+    if (!isLoginPage && !useAuthStore.getState().user) {
+      router.replace("/");
+    }
+  }, [pathname, isLoginPage, router]);
 
   const handleLogout = async () => {
     try {
       await endSession();
     } finally {
       clearSession();
-      router.push("/admin");
+      router.replace("/");
       setShowLogoutConfirm(false);
     }
   };

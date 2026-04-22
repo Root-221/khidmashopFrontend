@@ -23,7 +23,7 @@ export default function HomePage() {
     queryKey: ["featured-products"],
     queryFn: () => listFeaturedProducts(),
   });
-  const { data: categories = [] } = useQuery({
+  const { data: categories = [], isLoading: isLoadingCategories } = useQuery({
     queryKey: ["home-categories"],
     queryFn: () => listCategories(),
   });
@@ -41,7 +41,7 @@ export default function HomePage() {
       >
         <div className="absolute inset-0">
           <Image
-            src="/assets/home/acceuilBanner.jpg"
+            src="/assets/home/bg.png"
             alt="Bannière d'accueil KHIDMA SHOP"
             fill
             sizes="(min-width: 1280px) 1080px, (min-width: 768px) 720px, 100vw"
@@ -78,29 +78,40 @@ export default function HomePage() {
         </div>
 
         <div className="flex gap-3 overflow-x-auto pb-2 pr-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {categories.map((category) => (
-            <Link
-              key={category.id}
-              href={`/products?categoryId=${category.id}`}
-              className="flex w-[240px] shrink-0 items-center gap-4 rounded-[1.6rem] border border-black/10 bg-white p-3 transition hover:-translate-y-0.5 hover:border-black/20 hover:shadow-md sm:w-[280px]"
-            >
-              <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-[1.2rem] border border-black/10 bg-black/5">
-              <Image
-                src={getCategoryImage(category)}
-                alt={category.name}
-                fill
-                sizes="(min-width: 1280px) 200px, (min-width: 768px) 180px, 120px"
-                priority={category.id === prioritizedCategoryId}
-                loading={category.id === prioritizedCategoryId ? undefined : "lazy"}
-                className="object-cover"
-              />
-              </div>
-              <div className="min-w-0">
-                <p className="truncate text-sm font-medium tracking-tight">{category.name}</p>
-                <p className="mt-1 text-xs text-black/45">Ouvrir la catégorie</p>
-              </div>
-            </Link>
-          ))}
+          {isLoadingCategories ? (
+            <div className="flex w-full items-center justify-center py-8">
+              <Loader />
+            </div>
+          ) : categories.length > 0 ? (
+            categories.map((category) => (
+              <Link
+                key={category.id}
+                href={`/products?categoryId=${category.id}`}
+                className="flex w-[240px] shrink-0 items-center gap-4 rounded-[1.6rem] border border-black/10 bg-white p-3 transition hover:-translate-y-0.5 hover:border-black/20 hover:shadow-md sm:w-[280px]"
+              >
+                <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-[1.2rem] border border-black/10 bg-black/5">
+                  <Image
+                    src={getCategoryImage(category)}
+                    alt={category.name}
+                    fill
+                    sizes="(min-width: 1280px) 200px, (min-width: 768px) 180px, 120px"
+                    priority={category.id === prioritizedCategoryId}
+                    loading={category.id === prioritizedCategoryId ? undefined : "lazy"}
+                    className="object-cover"
+                  />
+                </div>
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-medium tracking-tight">{category.name}</p>
+                  <p className="mt-1 text-xs text-black/45">Ouvrir la catégorie</p>
+                </div>
+              </Link>
+            ))
+          ) : (
+            <div className="flex w-full flex-col items-center justify-center gap-2 rounded-[1.6rem] border border-dashed border-black/10 py-10 text-center text-black/45">
+              <p className="text-sm font-medium">La liste des catégories est vide.</p>
+              <p className="text-xs">Revenez plus tard pour découvrir nos sélections.</p>
+            </div>
+          )}
         </div>
       </section>
 
@@ -114,7 +125,11 @@ export default function HomePage() {
             Tout voir
           </Link>
         </div>
-        {isLoading ? <Loader className="py-10" /> : <ProductGrid products={data ?? []} />}
+        {isLoading ? (
+          <Loader className="py-10" />
+        ) : (
+          <ProductGrid products={data ?? []} emptyMessage="Aucun produit populaire pour le moment." />
+        )}
       </section>
     </div>
   );

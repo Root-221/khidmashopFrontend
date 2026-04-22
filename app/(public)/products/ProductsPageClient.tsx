@@ -77,7 +77,7 @@ export function ProductsPageClient() {
         className="relative overflow-hidden rounded-[2rem] border border-white/10 px-5 py-10 text-white shadow-[0_24px_80px_rgba(15,15,20,0.18)] sm:px-8 sm:py-12"
         style={{
           backgroundImage:
-            "linear-gradient(135deg, rgba(11, 12, 18, 0.62), rgba(20, 24, 35, 0.34)), url('/assets/products/headphone-1.jpg')",
+            "linear-gradient(135deg, rgba(11, 12, 18, 0.62), rgba(20, 24, 35, 0.34)), url('/assets/home/catalogue.png')",
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",
           backgroundSize: "cover",
