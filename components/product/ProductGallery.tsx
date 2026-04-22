@@ -15,12 +15,21 @@ export function ProductGallery({ product }: ProductGalleryProps) {
   return (
     <div className="space-y-3">
       <div className="grid gap-2 overflow-hidden rounded-3xl border border-black/10 bg-black/5">
-        <div className="relative w-full min-h-[300px] lg:min-h-[500px]">
+        <div className="relative w-full min-h-[400px] lg:min-h-[600px]">
+          {/* Background blurred layer to fill the div */}
+          <Image
+            src={product.images[active]}
+            alt=""
+            fill
+            className="object-cover blur-2xl opacity-30"
+            aria-hidden="true"
+          />
+          {/* Main image in contain mode to see it 'as is' */}
           <Image
             src={product.images[active]}
             alt={product.name}
             fill
-            className="object-cover"
+            className="relative z-10 object-contain p-4 rounded-3xl"
             sizes="(max-width: 768px) 100vw, 50vw"
             priority
           />
@@ -37,7 +46,7 @@ export function ProductGallery({ product }: ProductGalleryProps) {
               active === index ? "border-black" : "border-black/10",
             )}
           >
-            <Image src={image} alt={`${product.name} ${index + 1}`} fill className="object-cover" sizes="80px" />
+            <Image src={image} alt={`${product.name} ${index + 1}`} fill className="object-contain" sizes="80px" />
           </button>
         ))}
       </div>
