@@ -217,10 +217,14 @@ export default function AdminProductsPage() {
 
   const deleteMutation = useMutation({
     mutationFn: deleteProduct,
-    onSuccess: async () => {
+    onSuccess: async (data: { message: string }) => {
       await queryClient.invalidateQueries({ queryKey: ["admin-products"] });
       await queryClient.invalidateQueries({ queryKey: ["products"] });
-      toast.success("Produit supprimé", deleteTarget?.name || "");
+      toast.success(data.message || "Produit supprimé", deleteTarget?.name || "");
+      setDeleteTarget(null);
+    },
+    onError: (err: Error) => {
+      toast.error("Erreur de suppression", err.message);
       setDeleteTarget(null);
     },
   });
