@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
@@ -9,9 +9,7 @@ import { listCategories } from "@/services/category.service";
 import { listProductBrands, listProducts } from "@/services/product.service";
 import { ProductFilters } from "@/components/product/ProductFilters";
 import { ProductGrid } from "@/components/product/ProductGrid";
-import { Pagination } from "@/components/admin/Pagination";
 import { Loader } from "@/components/ui/Loader";
-import { cn } from "@/utils/cn";
 
 export function ProductsPageClient() {
   const searchParams = useSearchParams();
@@ -23,9 +21,6 @@ export function ProductsPageClient() {
     maxPrice: 100000,
   }));
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 8;
-
   useEffect(() => {
     const categoryId = searchParams.get("categoryId") ?? "";
     const search = searchParams.get("search") ?? "";
@@ -35,7 +30,6 @@ export function ProductsPageClient() {
       search,
       categoryId,
     }));
-    setCurrentPage(1);
   }, [searchParams]);
 
   const { data: categories = [] } = useQuery({
@@ -51,25 +45,7 @@ export function ProductsPageClient() {
     queryFn: () => listProducts(filters),
   });
 
-  const heading = useMemo(() => {
-    const total = products.length;
-    return `${total} produit${total > 1 ? "s" : ""}`;
-  }, [products.length]);
-
-  const totalPages = useMemo(() => Math.ceil(products.length / itemsPerPage), [products.length, itemsPerPage]);
-  
-  const paginatedProducts = useMemo(() => {
-    return products.slice(
-      (currentPage - 1) * itemsPerPage,
-      currentPage * itemsPerPage
-    );
-  }, [products, currentPage, itemsPerPage]);
-
-  const categoryImages: Record<string, string> = {
-    "cat-men": "/assets/categories/fashion.jpg",
-    "cat-shoes": "/assets/categories/shoes.jpg",
-    "cat-tech": "/assets/categories/tech.jpg",
-  };
+  const heading = `${products.length} produit${products.length > 1 ? "s" : ""}`;
 
   return (
     <div className="container-safe space-y-6 py-6">
@@ -144,14 +120,7 @@ export function ProductsPageClient() {
         <Loader className="py-10" />
       ) : (
         <div className="space-y-6">
-          <ProductGrid products={paginatedProducts} />
-          <div className="hidden sm:block">
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={setCurrentPage}
-            />
-          </div>
+          <ProductGrid products={products} />
         </div>
       )}
     </div>
