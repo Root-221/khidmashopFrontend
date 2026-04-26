@@ -5,6 +5,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import { MobileNavbar } from "@/components/layout/MobileNavbar";
 import { CartDrawer } from "@/components/cart/CartDrawer";
 import { Footer } from "@/components/layout/Footer";
+import { AssistantWidget } from "@/components/chat/AssistantWidget";
 
 export default function PublicLayout({ children }: { children: ReactNode }) {
   return (
@@ -15,6 +16,7 @@ export default function PublicLayout({ children }: { children: ReactNode }) {
         <Footer />
       </div>
       <CartDrawer />
+      <AssistantWidget />
       <MobileNavbar />
     </div>
   );
