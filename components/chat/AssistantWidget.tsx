@@ -10,7 +10,6 @@ import {
   Loader2,
   MessageSquareMore,
   Send,
-  Sparkles,
   X,
 } from "lucide-react";
 import { cn } from "@/utils/cn";
@@ -54,7 +53,7 @@ function createFallbackReply(message: string): AssistantMessage {
       "Une commande peut être annulée seulement si elle n’a pas encore été préparée et si elle date de moins de 30 minutes.";
   } else if (normalized.includes("commande") || normalized.includes("checkout")) {
     content =
-      "Pour commander, ajoute d’abord tes articles au panier, puis confirme ta commande. Si tu veux, je peux aussi t’aider à retrouver une commande.";
+      "Pour commander, choisis un produit, ajoute-le au panier, vérifie ton panier, renseigne tes informations, autorise la localisation puis confirme la commande. Si c’est ta première commande, tu pourras aussi choisir un code à 4 chiffres.";
   }
 
   return {
@@ -244,13 +243,13 @@ export function AssistantWidget() {
         <button
           type="button"
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-24 right-4 z-50 flex items-center gap-2 rounded-full border border-black/10 bg-black px-4 py-3 text-sm font-semibold text-white shadow-[0_24px_70px_rgba(0,0,0,0.22)] transition hover:-translate-y-0.5 hover:bg-black/90 md:bottom-6 md:right-6"
+          aria-label="Ouvrir Jamih"
+          className="fixed bottom-24 right-4 z-50 flex w-[92px] flex-col items-center justify-center gap-2 rounded-[1.6rem] border border-black/10 bg-black px-3 py-4 text-white shadow-[0_24px_70px_rgba(0,0,0,0.22)] transition hover:-translate-y-0.5 hover:bg-black/90 md:bottom-6 md:right-6"
         >
-          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10">
-            <Sparkles className="h-4 w-4" />
+          <span className="flex h-12 w-12 items-center justify-center rounded-[1.1rem] bg-white/10 ring-1 ring-white/10">
+            <Bot className="h-6 w-6" />
           </span>
-          <span className="hidden sm:inline">{assistantName}</span>
-          <span className="sm:hidden">{assistantName}</span>
+          <span className="text-[11px] font-semibold tracking-[0.16em]">{assistantName}</span>
         </button>
       ) : null}
 

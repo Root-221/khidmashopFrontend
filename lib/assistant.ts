@@ -299,14 +299,19 @@ export function detectAssistantIntent(message: string): AssistantIntent {
   if (!text) return "support";
   if (/(annuler|annulation|cancel)/.test(text)) return "cancel";
   if (
-    /(suivi|suivre|retrouver|details? de commande|commande)/.test(text) &&
-    /(commande|order|orders|id)/.test(text)
+    /(comment\s+)?(commander|acheter|payer|finaliser|valider|passer\s+commande)/.test(text) ||
+    /(panier|checkout|paiement|commande\s+maintenant)/.test(text)
+  ) {
+    return "checkout";
+  }
+  if (
+    /(suivi|suivre|retrouver|historique|mes commandes|voir mes commandes|détails? de commande|detail de commande|num[eé]ro de commande|id de commande)/.test(text) &&
+    /(commande|order|orders|id|num[eé]ro|numero)/.test(text)
   ) {
     return "orders";
   }
   if (/(pin|code pin|mot de passe|mdp)/.test(text)) return "pin";
   if (/(connexion|connecter|login|compte|se connecter|me connecter)/.test(text)) return "login";
-  if (/(panier|checkout|payer|paiement|valider|commander|passer commande)/.test(text)) return "checkout";
   if (/(catalogue|produit|produits|article|marque|categorie|catégorie|recherche|cherche|trouve|montre|recommande|chauss|chemise|polo|watch|sneaker|headphone)/.test(text)) {
     return "search";
   }
@@ -364,7 +369,7 @@ function buildSuggestions(
     case "checkout":
       return [
         { label: "Voir le panier", href: "/cart" },
-        { label: "Finaliser la commande", href: "/checkout" },
+        { label: "Continuer vers la commande", href: "/checkout" },
         { label: "Voir mes commandes", href: "/orders" },
       ];
     case "orders":
@@ -385,7 +390,7 @@ function buildSuggestions(
       ];
     case "pin":
       return [
-        { label: "Finaliser la commande", href: "/checkout" },
+        { label: "Continuer vers la commande", href: "/checkout" },
         { label: "Voir mes commandes", href: "/orders" },
       ];
     case "greeting":
@@ -423,7 +428,17 @@ function buildReply(
     case "greeting":
       return `Bonjour 👋 Je suis ${assistantName}. Je peux t’aider à trouver un produit, voir ton panier, finaliser ta commande ou retrouver une commande.`;
     case "checkout":
-      return "Pour commander, ajoute d’abord les articles au panier, puis confirme ta commande. Si c’est ta première fois, je peux aussi t’aider à choisir un code à 4 chiffres.";
+      return [
+        "Pour commander, c’est très simple :",
+        "1. Choisis le produit qui t’intéresse et ajoute-le au panier.",
+        "2. Ouvre ton panier pour vérifier tes articles.",
+        "3. Clique sur le bouton pour continuer la commande.",
+        "4. Indique ton numéro de téléphone et confirme-le.",
+        "5. Si tu es nouveau client, ajoute ton prénom, ton nom et ton adresse.",
+        "6. Autorise la localisation du téléphone pour aider la livraison.",
+        "7. Vérifie le résumé puis confirme la commande.",
+        "8. Si c’est ta première commande, choisis un code à 4 chiffres pour revenir plus vite la prochaine fois.",
+      ].join("\n");
     case "orders":
       return "Tu peux voir tes commandes dans la page de tes commandes. Si tu as le numéro d’une commande, je peux aussi t’aider à la retrouver.";
     case "cancel":
