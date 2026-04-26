@@ -72,12 +72,12 @@ function MessageProducts({ products }: { products: AssistantProduct[] }) {
   }
 
   return (
-    <div className="mt-3 grid gap-2">
+    <div className="mt-3 grid w-full max-w-full gap-2">
       {products.map((product) => (
         <Link
           key={product.id}
           href={product.href}
-          className="group flex items-center gap-3 rounded-[1.2rem] border border-black/10 bg-white p-2.5 transition hover:border-black/20 hover:bg-black/[0.02]"
+          className="group flex w-full min-w-0 items-center gap-3 overflow-hidden rounded-[1.2rem] border border-black/10 bg-white p-2.5 transition hover:border-black/20 hover:bg-black/[0.02]"
         >
           <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-[1rem] bg-black/5">
             <Image src={product.image} alt={product.name} fill className="object-cover" sizes="56px" />
@@ -302,7 +302,7 @@ export function AssistantWidget() {
                   >
                     <div
                       className={cn(
-                        "max-w-[85%] rounded-[1.4rem] px-4 py-3 text-sm leading-6 shadow-sm",
+                        "max-w-[85%] min-w-0 overflow-hidden rounded-[1.4rem] px-4 py-3 text-sm leading-6 shadow-sm",
                         message.role === "user"
                           ? "rounded-br-md bg-black text-white"
                           : "rounded-bl-md border border-black/10 bg-white text-black",
