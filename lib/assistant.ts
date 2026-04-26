@@ -363,19 +363,19 @@ function buildSuggestions(
   switch (intent) {
     case "checkout":
       return [
-        { label: "Ouvrir le panier", href: "/cart" },
-        { label: "Passer au checkout", href: "/checkout" },
-        { label: "Voir les commandes", href: "/orders" },
+        { label: "Voir le panier", href: "/cart" },
+        { label: "Finaliser la commande", href: "/checkout" },
+        { label: "Voir mes commandes", href: "/orders" },
       ];
     case "orders":
       return [
-        { label: "Mes commandes", href: "/orders" },
+        { label: "Voir mes commandes", href: "/orders" },
         { label: "Voir le catalogue", href: "/products" },
-        { label: "Ouvrir le panier", href: "/cart" },
+        { label: "Voir le panier", href: "/cart" },
       ];
     case "cancel":
       return [
-        { label: "Mes commandes", href: "/orders" },
+        { label: "Voir mes commandes", href: "/orders" },
         { label: "Voir le catalogue", href: "/products" },
       ];
     case "login":
@@ -385,8 +385,8 @@ function buildSuggestions(
       ];
     case "pin":
       return [
-        { label: "Ouvrir le checkout", href: "/checkout" },
-        { label: "Voir les commandes", href: "/orders" },
+        { label: "Finaliser la commande", href: "/checkout" },
+        { label: "Voir mes commandes", href: "/orders" },
       ];
     case "greeting":
       return assistantQuickPrompts;
@@ -405,7 +405,7 @@ function buildSuggestions(
       return [
         { label: "Voir le catalogue", href: "/products" },
         { label: "Comment commander ?", href: "/checkout" },
-        { label: "Suivre une commande", href: "/orders" },
+        { label: "Voir mes commandes", href: "/orders" },
       ];
   }
 }
@@ -421,21 +421,21 @@ function buildReply(
 
   switch (intent) {
     case "greeting":
-      return `Bonjour 👋 Je suis ${assistantName}. Je peux t’aider à trouver un produit, à ouvrir le panier, à comprendre le checkout ou à retrouver une commande.`;
+      return `Bonjour 👋 Je suis ${assistantName}. Je peux t’aider à trouver un produit, voir ton panier, finaliser ta commande ou retrouver une commande.`;
     case "checkout":
-      return "Pour commander, ajoute d’abord les articles au panier, puis ouvre /cart et valide dans /checkout. Si c’est ta première commande, le parcours peut te guider pour initialiser le PIN client.";
+      return "Pour commander, ajoute d’abord les articles au panier, puis confirme ta commande. Si c’est ta première fois, je peux aussi t’aider à choisir un code à 4 chiffres.";
     case "orders":
-      return "Tu peux consulter tes commandes dans /orders si tu es connecté. Avec l’ID de commande, la page publique /orders/[id] permet aussi d’ouvrir le détail.";
+      return "Tu peux voir tes commandes dans la page de tes commandes. Si tu as le numéro d’une commande, je peux aussi t’aider à la retrouver.";
     case "cancel":
-      return "Une commande peut être annulée seulement si elle est encore en attente (PENDING) et dans les 30 minutes suivant sa création.";
+      return "Une commande peut être annulée seulement si elle n’a pas encore été préparée et si elle date de moins de 30 minutes.";
     case "login":
-      return "Le client se connecte avec son numéro de téléphone et son PIN. L’administration utilise un email et un mot de passe.";
+      return "Le client se connecte avec son numéro de téléphone et son code à 4 chiffres. L’administration utilise un email et un mot de passe.";
     case "pin":
-      return "Le PIN sert à reconnecter rapidement un client. Il peut être défini pendant le premier parcours de commande.";
+      return "Le code à 4 chiffres sert à te reconnecter plus vite lors de ta prochaine visite.";
     case "support":
-      return `Je suis ${assistantName} et je peux t’aider sur le catalogue, les filtres, le panier, le checkout et les commandes. Dis-moi ce que tu cherches, et je te guide.`;
+      return `Je suis ${assistantName} et je peux t’aider sur les produits, les filtres, le panier, la commande et le suivi de tes achats. Dis-moi simplement ce que tu cherches.`;
     case "catalog":
-      return "Le catalogue est disponible dans /products. Tu peux filtrer par catégorie, marque et budget pour aller plus vite.";
+      return "Tu peux parcourir tous les produits, puis filtrer par catégorie, marque ou budget pour aller plus vite.";
     case "search":
     default:
       if (matches.length > 0) {
@@ -447,21 +447,21 @@ function buildReply(
           )
           .join("\n");
 
-        return `J’ai trouvé ${matches.length} produit${matches.length > 1 ? "s" : ""} qui semblent correspondre:\n${list}\n\nOuvre un produit pour voir les détails, ou précise la marque, la couleur ou le budget si tu veux que je resserre la recherche.`;
+        return `J’ai trouvé ${matches.length} produit${matches.length > 1 ? "s" : ""} qui peuvent t’intéresser:\n${list}\n\nOuvre un produit pour voir plus de détails, ou dis-moi une marque, une couleur ou un budget si tu veux que je cherche mieux.`;
       }
 
       if (category || brand) {
-        return "Je n’ai pas trouvé de produit exact pour ce filtre, mais tu peux ouvrir le catalogue et explorer les autres critères. Essaie aussi une autre orthographe ou un budget plus large.";
+        return "Je n’ai pas trouvé le produit exact, mais je peux t’aider à chercher autrement. Essaie une autre orthographe ou un budget plus large.";
       }
 
-      return "Je n’ai pas trouvé de correspondance exacte. Essaie une catégorie, une marque ou un budget. Exemple: \"chaussures noires\", \"Nike\" ou \"moins de 30 000 FCFA\".";
+      return "Je n’ai pas trouvé de correspondance exacte. Essaie par exemple \"chaussures noires\", \"Nike\" ou \"moins de 30 000 FCFA\".";
   }
 }
 
 function buildFallbackMessage(message: string) {
   const trimmed = message.trim();
   if (!trimmed) {
-    return "Je peux t’aider à trouver un produit, ouvrir le panier ou suivre une commande.";
+    return "Je peux t’aider à trouver un produit, voir ton panier ou suivre une commande.";
   }
   return trimmed;
 }

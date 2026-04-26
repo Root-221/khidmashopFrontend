@@ -10,4 +10,4 @@ export const assistantQuickPrompts: AssistantSuggestion[] = [
 ];
 
 export const assistantWelcomeMessage =
-  `Bonjour 👋 Je suis ${assistantName}, ton assistant boutique. Je peux t’aider à trouver un produit, comprendre le checkout, suivre une commande ou retrouver le bon chemin dans la boutique.`;
+  `Bonjour 👋 Je suis ${assistantName}, ton assistant boutique. Je peux t’aider à trouver un produit, finaliser ta commande, suivre tes achats ou retrouver le bon chemin dans la boutique.`;

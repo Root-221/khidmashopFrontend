@@ -47,14 +47,14 @@ function formatCurrency(value: number) {
 function createFallbackReply(message: string): AssistantMessage {
   const normalized = message.trim().toLowerCase();
   let content =
-    "Je n’ai pas pu charger la réponse complète pour le moment, mais tu peux ouvrir le catalogue, le panier ou la page des commandes selon ce que tu cherches.";
+    "Je n’ai pas pu charger la réponse complète pour le moment, mais je peux quand même t’aider à trouver un produit, voir ton panier ou suivre tes commandes.";
 
   if (normalized.includes("annuler")) {
     content =
-      "Une commande peut être annulée seulement si elle est encore en attente et dans les 30 minutes suivant sa création.";
+      "Une commande peut être annulée seulement si elle n’a pas encore été préparée et si elle date de moins de 30 minutes.";
   } else if (normalized.includes("commande") || normalized.includes("checkout")) {
     content =
-      "Pour commander, ajoute d’abord tes articles au panier, puis passe par /checkout. Si tu veux, je peux aussi t’aider à retrouver une commande.";
+      "Pour commander, ajoute d’abord tes articles au panier, puis confirme ta commande. Si tu veux, je peux aussi t’aider à retrouver une commande.";
   }
 
   return {
@@ -274,7 +274,7 @@ export function AssistantWidget() {
                     <span className="h-2 w-2 rounded-full bg-emerald-400" />
                   </div>
                   <p className="text-xs leading-5 text-white/65">
-                    Produits, panier, checkout et commandes
+                    Produits, panier et suivi des commandes
                     {isHydrated && messages.length > 1 ? " · session sauvegardée" : ""}
                   </p>
                 </div>
